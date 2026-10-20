@@ -109,12 +109,18 @@ function moveMapTo(lat, lng) {
 function buildPopupContent(location, weather) {
   const card = document.createElement("div");
   card.className = "weather-card";
-
+  if (weather.icon.endsWith("n")) {
+    card.classList.add("is-night");
+  }
   card.innerHTML = `
     <h2 class="weather-city"></h2>
-    <div class="weather-main">
+        <div class="weather-main">
       <img class="weather-icon" src="https://openweathermap.org/img/wn/${weather.icon}@2x.png" alt="${weather.description}">
-      <span class="weather-temp">${weather.temp}°C</span>
+      <div class="weather-summary">
+        <span class="weather-temp">${weather.temp}°C</span>
+        <p class="weather-desc">${weather.description}</p>
+      </div>
+    </div>
     </div>
     <p class="weather-desc">${weather.description}</p>
     <ul class="weather-details">
@@ -163,9 +169,10 @@ async function shareWeather(location, weather, button) {
 function openWeatherPopup(location, weather) {
   const content = buildPopupContent(location, weather);
 
-  currentMarker.bindPopup(content, {
+    currentMarker.bindPopup(content, {
     className: "weather-popup",
-    maxWidth: 280
+    maxWidth: 280,
+       autoPanPadding: [20, 20]
   });
 
   map.once("moveend", () => currentMarker.openPopup());

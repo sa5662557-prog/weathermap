@@ -94,6 +94,32 @@ body {
 
 #map {
   height: 70vh;
+  border: 4px solid var(--navy);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  font-family: var(--font-body);
+}
+
+#map .leaflet-bar {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+#map .leaflet-bar a {
+  color: var(--navy);
+  background: var(--surface);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+#map .leaflet-bar a:hover {
+  color: #FFFFFF;
+  background: var(--green);
+}
+#map .leaflet-tile-pane {
+  filter: grayscale(85%) brightness(1.05) contrast(0.95);
 }
 .map-area {
   position: relative;

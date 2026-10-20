@@ -129,19 +129,82 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 48px;
-  height: 48px;
-  margin: -24px 0 0 -24px;
-  border: 5px solid #d9d9d9;
-  border-top-color: #333333;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
   z-index: 1000;
+  padding: 14px 18px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transform: translate(-50%, -50%);
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+.drop {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin: 0 4px;
+  background: var(--green);
+  border-radius: 0 50% 50% 50%;
+  transform: rotate(45deg);
+  animation: drop-bounce 0.9s ease-in-out infinite;
+}
+
+.drop:nth-child(2) {
+  background: var(--navy);
+  animation-delay: 0.15s;
+}
+
+.drop:nth-child(3) {
+  background: var(--mango);
+  animation-delay: 0.3s;
+}
+
+@keyframes drop-bounce {
+  0%,
+  100% {
+    transform: translateY(0) rotate(45deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(45deg);
+  }
+}
+
+.map-pin span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30px;
+  height: 30px;
+  background: var(--navy);
+  border: 3px solid var(--mango);
+  border-radius: 50% 50% 50% 0;
+  box-shadow: 0 6px 12px rgba(27, 42, 78, 0.35);
+  transform: rotate(-45deg);
+  animation: pin-drop 0.6s ease-out;
+}
+
+.map-pin span::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  background: var(--mango);
+  border-radius: 50%;
+}
+
+@keyframes pin-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-40px) rotate(-45deg);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(4px) rotate(-45deg);
+  }
+  100% {
+    transform: translateY(0) rotate(-45deg);
   }
 }
 .search-card {

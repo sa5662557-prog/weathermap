@@ -15,6 +15,13 @@ const alertBox = document.getElementById("alert-box");
 const searchBtn = document.getElementById("search-btn");
 const loader = document.getElementById("loader");
 let currentMarker = null;
+const pinIcon = L.divIcon({
+  className: "map-pin",
+  html: "<span></span>",
+  iconSize: [30, 36],
+  iconAnchor: [15, 36],
+  popupAnchor: [0, -34]
+});
 function showAlert(message) {
   alertBox.textContent = message;
   alertBox.classList.remove("hidden");
@@ -104,7 +111,7 @@ function moveMapTo(lat, lng) {
 
   map.flyTo([lat, lng], 10, { duration: 1.5 });
 
-  currentMarker = L.marker([lat, lng]).addTo(map);
+    currentMarker = L.marker([lat, lng], { icon: pinIcon });
 }
 function buildPopupContent(location, weather) {
   const card = document.createElement("div");
@@ -175,7 +182,10 @@ function openWeatherPopup(location, weather) {
        autoPanPadding: [20, 20]
   });
 
-  map.once("moveend", () => currentMarker.openPopup());
+    map.once("moveend", () => {
+    currentMarker.addTo(map);
+    setTimeout(() => currentMarker.openPopup(), 600);
+  });
 }
 async function handleSearch(event) {
   event.preventDefault();

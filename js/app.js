@@ -12,7 +12,7 @@ L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
 const searchForm = document.getElementById("search-form");
 const locationInput = document.getElementById("location-input");
 const alertBox = document.getElementById("alert-box");
-
+let currentMarker = null;
 function showAlert(message) {
   alertBox.textContent = message;
   alertBox.classList.remove("hidden");
@@ -24,7 +24,7 @@ function hideAlert() {
 }
 
 async function getCoordinates(place) {
-  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=en&q=${encodeURIComponent(place)}`;
+  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=5&accept-language=en&q=${encodeURIComponent(place)}`;
 
   const response = await fetch(url);
 
@@ -38,10 +38,14 @@ async function getCoordinates(place) {
     throw new Error(`We couldn't find "${place}". Check the spelling and try again.`);
   }
 
+  const cityTypes = ["city", "town", "village"];
+  const best = results.find((result) => cityTypes.includes(result.addresstype)) || results[0];
+
   return {
-    lat: parseFloat(results[0].lat),
-    lng: parseFloat(results[0].lon),
-    displayName: results[0].display_name
+    lat: parseFloat(best.lat),
+    lng: parseFloat(best.lon),
+    name: best.name || place,
+    displayName: best.display_name
   };
 }
 async function getWeather(lat, lng) {
@@ -79,7 +83,15 @@ async function getWeather(lat, lng) {
     icon: data.weather[0].icon
   };
 }
+function moveMapTo(lat, lng) {
+  if (currentMarker) {
+    map.removeLayer(currentMarker);
+  }
 
+  map.flyTo([lat, lng], 10, { duration: 1.5 });
+
+  currentMarker = L.marker([lat, lng]).addTo(map);
+}
 async function handleSearch(event) {
   event.preventDefault();
   hideAlert();
@@ -94,6 +106,7 @@ async function handleSearch(event) {
     try {
     const location = await getCoordinates(place);
     const weather = await getWeather(location.lat, location.lng);
+    moveMapTo(location.lat, location.lng);
     console.log(location, weather);
   } catch (error) {
     showAlert(error.message);

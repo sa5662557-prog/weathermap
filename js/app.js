@@ -12,6 +12,8 @@ L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
 const searchForm = document.getElementById("search-form");
 const locationInput = document.getElementById("location-input");
 const alertBox = document.getElementById("alert-box");
+const searchBtn = document.getElementById("search-btn");
+const loader = document.getElementById("loader");
 let currentMarker = null;
 function showAlert(message) {
   alertBox.textContent = message;
@@ -22,11 +24,23 @@ function hideAlert() {
   alertBox.textContent = "";
   alertBox.classList.add("hidden");
 }
+function setLoading(isLoading) {
+  loader.classList.toggle("hidden", !isLoading);
+  searchBtn.disabled = isLoading;
+}
+
+async function safeFetch(url) {
+  try {
+    return await fetch(url);
+  } catch {
+    throw new Error("Network problem. Check your internet connection and try again.");
+  }
+}
 
 async function getCoordinates(place) {
   const url = `https://nominatim.openstreetmap.org/search?format=json&limit=5&accept-language=en&q=${encodeURIComponent(place)}`;
 
-  const response = await fetch(url);
+    const response = await safeFetch(url);
 
   if (!response.ok) {
     throw new Error("The location service is not responding right now. Please try again.");
@@ -51,7 +65,7 @@ async function getCoordinates(place) {
 async function getWeather(lat, lng) {
   const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${OWM_API_KEY}&units=metric`;
 
-  const response = await fetch(url);
+    const response = await safeFetch(url);
 
   if (response.status === 401) {
     throw new Error("The weather service key is not active yet. Please try again later.");
@@ -167,14 +181,19 @@ async function handleSearch(event) {
     return;
   }
 
-    try {
+  setLoading(true);
+
+  try {
     const location = await getCoordinates(place);
     const weather = await getWeather(location.lat, location.lng);
     moveMapTo(location.lat, location.lng);
     openWeatherPopup(location, weather);
   } catch (error) {
     showAlert(error.message);
+  } finally {
+    setLoading(false);
   }
 }
 
 searchForm.addEventListener("submit", handleSearch);
+locationInput.addEventListener("input", hideAlert);

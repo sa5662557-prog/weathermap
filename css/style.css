@@ -449,3 +449,61 @@ body {
     width: 100%;
   }
 }
+.theme-toggle {
+  margin-left: auto;
+  width: 44px;
+  height: 44px;
+  font-size: 1.2rem;
+  background: var(--surface);
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.theme-toggle:hover {
+  border-color: var(--green);
+  transform: rotate(20deg);
+}
+
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0F1A2B;
+  --surface: #1A2740;
+  --navy: #2C4A82;
+  --line: #2E3D57;
+  --muted: #9AA8B5;
+  --danger: #FF7A8A;
+  --danger-soft: #3A1F2B;
+  --text-light: #E6EDF5;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="dark"] body,
+[data-theme="dark"] .search-input,
+[data-theme="dark"] .weather-card,
+[data-theme="dark"] #map .leaflet-bar a {
+  color: var(--text-light);
+}
+
+[data-theme="dark"] #map {
+  background: #1A1F29;
+}
+
+[data-theme="dark"] #map .leaflet-tile-pane {
+  filter: grayscale(85%) invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9);
+}
+
+[data-theme="dark"] #map .weather-popup .leaflet-popup-content-wrapper,
+[data-theme="dark"] #map .weather-popup .leaflet-popup-tip {
+  background: var(--surface);
+}
+
+[data-theme="dark"] #map .leaflet-control-attribution {
+  color: var(--muted);
+  background: rgba(26, 39, 64, 0.85);
+}

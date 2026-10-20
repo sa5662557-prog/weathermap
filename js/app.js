@@ -214,3 +214,46 @@ async function handleSearch(event) {
 
 searchForm.addEventListener("submit", handleSearch);
 locationInput.addEventListener("input", hideAlert);
+const themeToggle = document.getElementById("theme-toggle");
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  const isDark = theme === "dark";
+  themeToggle.textContent = isDark ? "☀️" : "🌙";
+  themeToggle.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
+}
+
+function getSavedTheme() {
+  try {
+    return localStorage.getItem("weathermap-theme");
+  } catch {
+    return null;
+  }
+}
+
+function saveTheme(theme) {
+  try {
+    localStorage.setItem("weathermap-theme", theme);
+  } catch {
+    console.warn("Theme preference could not be saved.");
+  }
+}
+
+function getInitialTheme() {
+  const saved = getSavedTheme();
+
+  if (saved) {
+    return saved;
+  }
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function toggleTheme() {
+  const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  applyTheme(nextTheme);
+  saveTheme(nextTheme);
+}
+
+applyTheme(getInitialTheme());
+themeToggle.addEventListener("click", toggleTheme);

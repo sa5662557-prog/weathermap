@@ -44,6 +44,41 @@ async function getCoordinates(place) {
     displayName: results[0].display_name
   };
 }
+async function getWeather(lat, lng) {
+  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${OWM_API_KEY}&units=metric`;
+
+  const response = await fetch(url);
+
+  if (response.status === 401) {
+    throw new Error("The weather service key is not active yet. Please try again later.");
+  }
+
+  if (response.status === 404) {
+    throw new Error("No weather data was found for this place.");
+  }
+
+  if (response.status === 429) {
+    throw new Error("Too many requests. Please wait a minute and try again.");
+  }
+
+  if (!response.ok) {
+    throw new Error("We couldn't get the weather right now. Please try again.");
+  }
+
+  const data = await response.json();
+
+  return {
+    city: data.name,
+    country: data.sys.country,
+    temp: Math.round(data.main.temp),
+    feelsLike: Math.round(data.main.feels_like),
+    humidity: data.main.humidity,
+    windSpeed: Math.round(data.wind.speed * 3.6),
+    clouds: data.clouds.all,
+    description: data.weather[0].description,
+    icon: data.weather[0].icon
+  };
+}
 
 async function handleSearch(event) {
   event.preventDefault();
@@ -56,9 +91,10 @@ async function handleSearch(event) {
     return;
   }
 
-  try {
+    try {
     const location = await getCoordinates(place);
-    console.log(location);
+    const weather = await getWeather(location.lat, location.lng);
+    console.log(location, weather);
   } catch (error) {
     showAlert(error.message);
   }

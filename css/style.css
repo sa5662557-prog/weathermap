@@ -415,3 +415,37 @@ body {
 .share-btn:active {
   transform: translateY(1px);
 }
+@media (max-width: 768px) {
+  body {
+    padding: 12px;
+  }
+
+  .site-header {
+    margin-bottom: 12px;
+  }
+
+  .search-card {
+    position: static;
+    width: 100%;
+    margin-bottom: 12px;
+  }
+
+  #map {
+    border-width: 3px;
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 420px) {
+  .search-form {
+    flex-direction: column;
+  }
+
+  .search-input {
+    flex: none;
+  }
+
+  .search-btn {
+    width: 100%;
+  }
+}

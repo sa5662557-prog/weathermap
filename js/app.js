@@ -92,6 +92,70 @@ function moveMapTo(lat, lng) {
 
   currentMarker = L.marker([lat, lng]).addTo(map);
 }
+function buildPopupContent(location, weather) {
+  const card = document.createElement("div");
+  card.className = "weather-card";
+
+  card.innerHTML = `
+    <h2 class="weather-city"></h2>
+    <div class="weather-main">
+      <img class="weather-icon" src="https://openweathermap.org/img/wn/${weather.icon}@2x.png" alt="${weather.description}">
+      <span class="weather-temp">${weather.temp}°C</span>
+    </div>
+    <p class="weather-desc">${weather.description}</p>
+    <ul class="weather-details">
+      <li><span>Feels like</span> <strong>${weather.feelsLike}°C</strong></li>
+      <li><span>Humidity</span> <strong>${weather.humidity}%</strong></li>
+      <li><span>Wind</span> <strong>${weather.windSpeed} km/h</strong></li>
+      <li><span>Clouds</span> <strong>${weather.clouds}%</strong></li>
+    </ul>
+    <button type="button" class="share-btn">Share</button>
+  `;
+
+  const cityTitle = weather.country ? `${location.name}, ${weather.country}` : location.name;
+  card.querySelector(".weather-city").textContent = cityTitle;
+
+  const shareBtn = card.querySelector(".share-btn");
+  shareBtn.addEventListener("click", () => shareWeather(location, weather, shareBtn));
+
+  return card;
+}
+
+async function shareWeather(location, weather, button) {
+  const message = `Weather in ${location.name}: ${weather.temp}°C, ${weather.description}. Humidity ${weather.humidity}%, wind ${weather.windSpeed} km/h.`;
+
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: "WeatherMap", text: message, url: window.location.href });
+    } catch (error) {
+      if (error.name !== "AbortError") {
+        showAlert("Sharing didn't work. Please try again.");
+      }
+    }
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(`${message}\n${window.location.href}`);
+    button.textContent = "Copied!";
+    setTimeout(() => {
+      button.textContent = "Share";
+    }, 2000);
+  } catch (error) {
+    showAlert("Couldn't copy the weather. Please try again.");
+  }
+}
+
+function openWeatherPopup(location, weather) {
+  const content = buildPopupContent(location, weather);
+
+  currentMarker.bindPopup(content, {
+    className: "weather-popup",
+    maxWidth: 280
+  });
+
+  map.once("moveend", () => currentMarker.openPopup());
+}
 async function handleSearch(event) {
   event.preventDefault();
   hideAlert();
@@ -107,7 +171,7 @@ async function handleSearch(event) {
     const location = await getCoordinates(place);
     const weather = await getWeather(location.lat, location.lng);
     moveMapTo(location.lat, location.lng);
-    console.log(location, weather);
+    openWeatherPopup(location, weather);
   } catch (error) {
     showAlert(error.message);
   }
